@@ -1,3 +1,7 @@
+[![Watch the video](https://res.cloudinary.com/dnimidvwh/image/upload/v1755671529/16481db2-136d-4a12-94a1-fa9ea3100574.png)](https://res.cloudinary.com/dnimidvwh/video/upload/v1755671499/Screen_Recording_2025-08-20_114019_scdj6l.mp4)
+
+
+
 # AI Chat Application with Document Processing
 
 This application provides a user-friendly interface for chatting with an AI assistant that can process information from multiple sources:
