@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .app-container {
+            height: 100vh;
+            display: flex;
+            padding: 0;
+            overflow: hidden;
+        }
+        .resource-area {
+            background-color: #ffffff;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100%;
+        }
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #f8f9fa;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            margin: 20px 20px 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .chat-input {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 1rem;
+            max-width: 80%;
+            position: relative;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+        .assistant-message {
+            background-color: #e9ecef;
+            color: #212529;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+        .resource-card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .resource-card h5 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 0.5rem;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+            background-color: #f1f8ff;
+        }
+        .upload-icon {
+            font-size: 2rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .typing-indicator {
+            display: none;
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            border-radius: 1rem;
+            margin-bottom: 15px;
+            width: fit-content;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid app-container">
+        <div class="row h-100 w-100 m-0">
+            <!-- Resource Area (Left Side) -->
+            <div class="col-md-4 resource-area p-4">
+                <h3 class="mb-4">Resources</h3>
+                
+                <!-- Document Upload -->
+                <div class="resource-card">
+                    <h5>Upload Document</h5>
+                    <div class="upload-area" id="dropArea">
+                        <div class="upload-icon">📄</div>
+                        <p>Drag & drop your PDF here or click to browse</p>
+                        <input type="file" id="fileInput" class="d-none" accept=".pdf">
+                    </div>
+                    <div id="uploadedFiles" class="mt-3"></div>
+                </div>
+                
+                <!-- Text Input -->
+                <div class="resource-card">
+                    <h5>Text Input</h5>
+                    <div class="mb-3">
+                        <textarea class="form-control" id="textInput" rows="4" placeholder="Paste or type text here..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Website URL -->
+                <div class="resource-card">
+                    <h5>Website URL</h5>
+                    <div class="mb-3">
+                        <input type="url" class="form-control" id="websiteUrl" placeholder="https://example.com">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Area (Right Side) -->
+            <div class="col-md-8 chat-area p-0">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="assistant-message message">
+                        Hello! I'm your AI assistant. Upload a document, enter text, or provide a website URL on the left, then ask me a question about it.
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator">
+                        AI is thinking...
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="userInput" placeholder="Type your message here...">
+                        <button class="btn btn-primary" id="sendButton">
+                            <i class="bi bi-send"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Generate a random session ID
+        const sessionId = Math.random().toString(36).substring(2, 15);
+        
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const textInput = document.getElementById('textInput');
+        const websiteUrl = document.getElementById('websiteUrl');
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFiles = document.getElementById('uploadedFiles');
+        
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // File Upload Handling
+        dropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#007bff';
+            dropArea.style.backgroundColor = '#f1f8ff';
+        });
+        
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.borderColor = '#dee2e6';
+            dropArea.style.backgroundColor = '';
+        });
+        
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#dee2e6';
+            dropArea.style.backgroundColor = '';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+        
+        function handleFileSelect() {
+            // In a real implementation, this would upload the file to the server
+            // For now, we'll just display the filename
+            const files = fileInput.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'application/pdf') {
+                    uploadedFiles.innerHTML = `
+                        <div class="alert alert-success">
+                            <strong>Uploaded:</strong> ${file.name}
+                        </div>
+                    `;
+                    // Here you would normally upload the file to the server
+                    // uploadFile(file);
+                } else {
+                    uploadedFiles.innerHTML = `
+                        <div class="alert alert-danger">
+                            <strong>Error:</strong> Please upload a PDF file.
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('document', file);
+            
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Upload successful:', data);
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+            });
+        }
+        
+        function sendMessage() {
+            const query = userInput.value.trim();
+            if (query === '') return;
+            
+            // Add user message to chat
+            addMessage(query, 'user');
+            userInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Prepare data for API request
+            const requestData = {
+                userQuery: query,
+                sessionId: sessionId,
+                textInput: textInput.value.trim(),
+                websiteUrl: websiteUrl.value.trim()
+            };
+            
+            // Send request to backend
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add AI response to chat
+                addMessage(data.reply, 'assistant');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                typingIndicator.style.display = 'none';
+                addMessage('Sorry, there was an error processing your request.', 'assistant');
+            });
+        }
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender + '-message');
+            messageDiv.textContent = text;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>

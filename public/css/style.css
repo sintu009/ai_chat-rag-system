@@ -1,0 +1,62 @@
+/* Additional styles for the chat application */
+.message-time {
+    font-size: 0.75rem;
+    color: rgba(0,0,0,0.5);
+    margin-top: 5px;
+}
+
+.user-message .message-time {
+    color: rgba(255,255,255,0.7);
+}
+
+.resource-area .card-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.chat-header {
+    padding: 15px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.clear-chat {
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.clear-chat:hover {
+    color: #dc3545;
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .resource-area, .chat-area {
+        width: 100%;
+        height: auto;
+    }
+    
+    .resource-area {
+        max-height: 40vh;
+        overflow-y: auto;
+    }
+    
+    .chat-area {
+        height: 60vh;
+    }
+}
