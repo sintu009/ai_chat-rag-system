@@ -1,0 +1,26 @@
+{
+  "name": "4_class",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@langchain/community": "^0.3.53",
+    "@langchain/core": "^0.3.72",
+    "@langchain/google-genai": "^0.2.16",
+    "@langchain/openai": "^0.6.9",
+    "@langchain/qdrant": "^0.1.3",
+    "body-parser": "^2.2.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "html-to-text": "^9.0.5",
+    "jsdom": "^26.1.0",
+    "pdf-parse": "^1.1.1"
+  }
+}
